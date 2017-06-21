@@ -1,5 +1,4 @@
 #include <iostream>
-#include <cstring>
 #include "EscapeRoomWrapper.h"
 
 using mtm::escaperoom::EscapeRoomWrapper;
@@ -40,8 +39,7 @@ EscapeRoomWrapper& EscapeRoomWrapper::operator=(const EscapeRoomWrapper& room){
 }
 
 bool EscapeRoomWrapper::operator==(const EscapeRoomWrapper &room) const {
-    return (areEqualRooms(this->escapy, room.escapy) &&
-            strcmp(roomGetName(this->escapy), roomGetName(room.escapy))==0);
+    return (areEqualRooms(this->escapy, room.escapy));
 }
 bool EscapeRoomWrapper::operator!=(const EscapeRoomWrapper &room) const {
     return !(*this==room);
@@ -50,9 +48,8 @@ bool EscapeRoomWrapper::operator>(const EscapeRoomWrapper &room) const {
     return (isBiggerRoom(this->escapy, room.escapy));
 }
 bool EscapeRoomWrapper::operator<(const EscapeRoomWrapper &room) const {
-    return !(*this>room)&&!(*this==room);
+    return isBiggerRoom(room.escapy,this->escapy);
 }
-
 int EscapeRoomWrapper::level() const{
     return getLevel(this->escapy);
 }
@@ -75,7 +72,8 @@ int EscapeRoomWrapper::getMaxTime() const{
 int EscapeRoomWrapper::getMaxParticipants() const {
     return roomGetMaxParticipants(this->escapy);
 }
-
-std::ostream& operator<<(std::ostream& output, const EscapeRoomWrapper& room){
-    return output << getName() << level() << getMaxParticipants();
+std::ostream& mtm::escaperoom::operator<<(std::ostream &output,
+                                          const EscapeRoomWrapper &room) {
+    return output << room.getName() << " (" << room.getMaxTime() << "/"
+                  << room.level() << "/" << room.getMaxParticipants()<< ")";
 }
