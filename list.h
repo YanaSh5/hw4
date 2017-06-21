@@ -65,7 +65,10 @@ public:
 
     template<typename Predicate>
     Iterator find(const Predicate& predicate);
-    //void sort(const Compare& compare);
+
+    template <typename Compare>
+    void sort(const Compare& compare);
+
     int getSize();
 };
 template<class T>
@@ -122,7 +125,7 @@ template<class T>
     return current->data;
 }
 template<class T>
-typename List<T>::Iterator List<T>::begin() const {
+typename List<T>::Iterator List<T>:: begin() const {
     return Iterator(this,head);
 }
 template<class T>
@@ -185,6 +188,29 @@ typename List<T>::Iterator List<T>::find(const Predicate &predicate) {
     }
     return end();
 }
+template <class T>
+template <typename Compare>
+void List<T>::sort(const Compare &compare) {
+    int size = this->size;
+    T tempData;
+    Iterator currentTail = end();
+    for (int i = 0; i < size; i++) {
+        Iterator it = begin();
+        while (it.current->next!= NULL) {
+            T &x=it.operator*();
+            T &y=(++it).operator*();
+            bool compare_=compare(x,y);
+            if (!(compare_)) {
+                tempData=x;
+                x=y;
+                y=tempData;
+            }
+        }
+        size--;
+        currentTail--;
+    }
+}
+
 template <class T>
 List<T>::List(const List<T>& list):size(0),head(NULL),tail(NULL){
     for (Iterator it=list.begin(); it.current!=NULL; it++){
