@@ -45,7 +45,7 @@ public:
 
         bool operator!=(const Iterator &iteratorPosition) const;
 
-        const T &operator*() const;
+        T &operator*() const;
 
         Iterator(const Iterator &) = default;
 
@@ -63,13 +63,14 @@ public:
 
     void remove(Iterator iterator);
 
-//    Iterator find_if(Iterator first, Iterator last, Predicate pred);
+    template<typename Predicate>
+    Iterator find(const Predicate& predicate);
     //void sort(const Compare& compare);
     int getSize();
 };
 template<class T>
 List<T>::List() :
-        head(NULL) , tail(NULL), size(0)
+        size(0), head(NULL) , tail(NULL)
 {}
 template<class T>
 List<T>::~List() {
@@ -88,7 +89,7 @@ typename List<T>::Iterator& List<T>::Iterator::operator++() {
 template<class T>
 typename List<T>::Iterator List<T>::Iterator::operator++(int) {
     Iterator result=*this;
-    ++*this;
+    ++(*this);
     return result;
 }
 template<class T>
@@ -114,7 +115,7 @@ bool List<T>::Iterator::operator!=(const Iterator& iteratorPosition)const {
 }
 
 template<class T>
-const T& List<T>::Iterator::operator*() const {
+ T& List<T>::Iterator::operator*() const {
     if (linked_list->tail==NULL){
         throw mtm::ListExceptions::ElementNotFound();
     };
@@ -174,20 +175,23 @@ void List<T>::remove(Iterator iterator) {
     iterator.current=NULL;
 }
 
-
 template <class T>
-List<T>::List(const List<T>& list){
+template <typename Predicate>
+typename List<T>::Iterator List<T>::find(const Predicate &predicate) {
+    for (Iterator it = begin(); it.current != NULL; it++) {
+        if (predicate(it.operator*())) {
+            return it;
+        }
+    }
+    return end();
+}
+template <class T>
+List<T>::List(const List<T>& list):size(0),head(NULL),tail(NULL){
     for (Iterator it=list.begin(); it.current!=NULL; it++){
         this->insert(it.operator*());/////need to be updated
     }
 }
 
-/*template <class T>
-void List<T>::~List<T>() {
-    for (Iterator it=this->begin(); it.current!=NULL; it++){
-        delete it.current;
-    }
-}*/////////////////////////
 
 template <class T>
 List<T>& List<T>::operator=(const List<T>& list) {///destractor/////////////////////////???
@@ -225,6 +229,8 @@ template <class T>
 int List<T>::getSize() {
     return size;
 }
+
+
 //iterator functions
 
 
