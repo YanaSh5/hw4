@@ -119,7 +119,7 @@ bool List<T>::Iterator::operator!=(const Iterator& iteratorPosition)const {
 
 template<class T>
  T& List<T>::Iterator::operator*() const {
-    if (linked_list->tail==NULL){
+    if (current==NULL){
         throw mtm::ListExceptions::ElementNotFound();
     };
     return current->data;
