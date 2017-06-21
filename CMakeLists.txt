@@ -3,5 +3,5 @@ project(HW4)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCE_FILES testEnigma.cpp Enigma.cpp list.h)
+set(SOURCE_FILES list_example.cpp list.h)
 add_executable(HW4 ${SOURCE_FILES})
