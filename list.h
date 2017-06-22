@@ -109,9 +109,9 @@ typename List<T>::Iterator List<T>::Iterator::operator--(int) {
 template<class T>
 bool List<T>::Iterator::operator==(const Iterator &iteratorPosition) const {
     return (((iteratorPosition.current==linked_list->tail)&&
-            (current==linked_list->tail))
+             (current==linked_list->tail))
             ||((iteratorPosition.linked_list==this->linked_list))&&
-                                  (iteratorPosition.current)==(current));
+              (iteratorPosition.current)==(current));
 }
 template<class T>
 bool List<T>::Iterator::operator!=(const Iterator& iteratorPosition)const {
@@ -119,7 +119,7 @@ bool List<T>::Iterator::operator!=(const Iterator& iteratorPosition)const {
 }
 
 template<class T>
- T& List<T>::Iterator::operator*() const {
+T& List<T>::Iterator::operator*() const {
     if (current==NULL){
         throw mtm::ListExceptions::ElementNotFound();
     };
@@ -175,7 +175,7 @@ void List<T>::insert(const T &data, Iterator iterator) {
 template <class T>
 void List<T>::remove(Iterator iterator) {
     if ((iterator.linked_list!=this || this->getSize()==0)||
-            iterator.current==NULL){
+        iterator.current==NULL){
         throw mtm::ListExceptions::ElementNotFound();
     }
     if((iterator!=begin())&&(iterator!=end())) {
@@ -214,12 +214,14 @@ typename List<T>::Iterator List<T>::find(const Predicate &predicate) {
 template <class T>
 template <typename Compare>
 void List<T>::sort(const Compare &compare) {
-    int size = this->size;
     T tempData;
     Iterator currentTail = Iterator(this, tail);
     for (int i = 0; i < size; i++) {
+        if (i==4999){
+            std::cout<<"hi";
+        }
         Iterator it = begin();
-        while (it.current->next!= NULL) {
+        while (it.current!= currentTail.current) {
             T &x=*it;
             T &y=*(++it);
             bool compare_=compare(x,y);
@@ -229,7 +231,6 @@ void List<T>::sort(const Compare &compare) {
                 y=tempData;
             }
         }
-        size--;
         currentTail--;
     }
 }
@@ -290,5 +291,3 @@ int List<T>::getSize() {
 
 
 #endif //HW4_LIST_H
-
-
