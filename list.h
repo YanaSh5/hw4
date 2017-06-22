@@ -110,7 +110,8 @@ template<class T>
 bool List<T>::Iterator::operator==(const Iterator &iteratorPosition) const {
     return (((iteratorPosition.current==linked_list->tail)&&
             (current==linked_list->tail))
-            ||(iteratorPosition.current==current));
+            ||((iteratorPosition.linked_list==this->linked_list))&&
+                                  (iteratorPosition.current)==(current));
 }
 template<class T>
 bool List<T>::Iterator::operator!=(const Iterator& iteratorPosition)const {
@@ -130,8 +131,13 @@ typename List<T>::Iterator List<T>:: begin() const {
 }
 template<class T>
 typename List<T>::Iterator List<T>::end() const {
-    return Iterator(this,tail);
+    List<T>::Iterator iterator=Iterator(this,tail);
+    if (iterator.current!=NULL){
+        iterator++;
+    }
+    return iterator;
 }
+
 template<class T>
 void List<T>::insert(const T &data) {
     node* temp = new node(data,tail,NULL);
@@ -150,7 +156,7 @@ void List<T>::insert(const T &data, Iterator iterator) {
     if (iterator.linked_list!=this){
         throw mtm::ListExceptions::ElementNotFound();
     }
-    if (iterator.current==tail) {
+    if (getSize()==0) {
         insert(data);
     }
     else if (iterator.current==head){
@@ -168,21 +174,38 @@ void List<T>::insert(const T &data, Iterator iterator) {
 }
 template <class T>
 void List<T>::remove(Iterator iterator) {
-    if (iterator.linked_list!=this || this->getSize()==0){
+    if ((iterator.linked_list!=this || this->getSize()==0)||
+            iterator.current==NULL){
         throw mtm::ListExceptions::ElementNotFound();
     }
-    iterator.current->previous->next=iterator.current->next;
-    iterator.current->next->previous=iterator.current->previous;
+    if((iterator!=begin())&&(iterator!=end())) {
+        iterator.current->previous->next = iterator.current->next;
+        iterator.current->next->previous = iterator.current->previous;
+    }
+    else if (iterator==begin()){
+        head=iterator.current->next;
+        if (size!=1) {
+            head->previous = NULL;
+        }
+        else{
+            head=NULL;
+            tail=NULL;
+        }
+    }
+    else{
+        tail=iterator.current->previous;
+        tail->next=NULL;
+    }
     delete iterator.current;
+    iterator.current = NULL;
     size--;
-    iterator.current=NULL;
 }
 
 template <class T>
 template <typename Predicate>
 typename List<T>::Iterator List<T>::find(const Predicate &predicate) {
     for (Iterator it = begin(); it.current != NULL; it++) {
-        if (predicate(it.operator*())) {
+        if (predicate(*it)) {
             return it;
         }
     }
@@ -193,12 +216,12 @@ template <typename Compare>
 void List<T>::sort(const Compare &compare) {
     int size = this->size;
     T tempData;
-    Iterator currentTail = end();
+    Iterator currentTail = Iterator(this, tail);
     for (int i = 0; i < size; i++) {
         Iterator it = begin();
         while (it.current->next!= NULL) {
-            T &x=it.operator*();
-            T &y=(++it).operator*();
+            T &x=*it;
+            T &y=*(++it);
             bool compare_=compare(x,y);
             if (!(compare_)) {
                 tempData=x;
@@ -214,7 +237,7 @@ void List<T>::sort(const Compare &compare) {
 template <class T>
 List<T>::List(const List<T>& list):size(0),head(NULL),tail(NULL){
     for (Iterator it=list.begin(); it.current!=NULL; it++){
-        this->insert(it.operator*());/////need to be updated
+        this->insert(*it);
     }
 }
 
@@ -224,9 +247,15 @@ List<T>& List<T>::operator=(const List<T>& list) {///destractor/////////////////
     if (*this==list){
         return *this;
     }
-    List temp=List(list);
-    this->~List;
-    *this=temp;
+    while(head!=NULL){
+        node* to_delete=head;
+        head=head->next;
+        delete to_delete;
+        size--;
+    }
+    for (Iterator it=list.begin(); it.current!=NULL; it++){
+        this->insert(*it);
+    }
     return *this;
 }
 
